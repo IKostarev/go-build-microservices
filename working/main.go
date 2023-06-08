@@ -10,19 +10,17 @@ import (
 )
 
 func main() {
-	l := log.New(os.Stdout, "product-api", log.LstdFlags)
+	logger := log.New(os.Stdout, "product-api", log.LstdFlags)
 
-	hh := handlers.NewHello(l)
-	gh := handlers.NewGoodbye(l)
+	productHandler := handlers.NewProducts(logger)
 
-	sm := http.NewServeMux()
+	serveMux := http.NewServeMux()
 
-	sm.Handle("/hello", hh)
-	sm.Handle("/goodbye", gh)
+	serveMux.Handle("/", productHandler)
 
 	s := &http.Server{
 		Addr:         ":9090",
-		Handler:      sm,
+		Handler:      serveMux,
 		IdleTimeout:  120 * time.Second,
 		ReadTimeout:  1 * time.Second,
 		WriteTimeout: 1 * time.Second,
@@ -31,14 +29,14 @@ func main() {
 	go func() {
 		err := s.ListenAndServe()
 		if err != nil {
-			l.Fatal(err)
+			logger.Fatal(err)
 		}
 	}()
 
 	signalCh := make(chan os.Signal)
 
 	sig := <-signalCh
-	l.Println("Recieved terminate, graceful shutdown", sig)
+	logger.Println("Recieved terminate, graceful shutdown", sig)
 
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
