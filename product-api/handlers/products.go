@@ -1,7 +1,7 @@
 package handlers
 
 import (
-	"go-build-microservices/working/data"
+	"go-build-microservices-product-api/storage"
 	"log"
 	"net/http"
 )
@@ -26,7 +26,7 @@ func (p *Products) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 func (p *Products) getProducts(w http.ResponseWriter, r *http.Request) {
-	listProduct := data.GetProducts()
+	listProduct := storage.GetProducts()
 
 	err := listProduct.ToJSON(w)
 	if err != nil {
